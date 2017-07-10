@@ -37,10 +37,10 @@ def adjust_gamma(image, gamma=1.0):
 
 def threshold_color(image_name):
 	# load the image
-	# image = equalizeHist(image_name)
 
-	image = cv2.imread(image_name)
-	image = adjust_gamma(image, 0.5)
+	# image = cv2.imread(image_name)
+	image = equalizeHist(image_name)
+	image = adjust_gamma(image, 0.8)
 	# define the list of boundaries
 
 	# ([86, 31, 4], [220, 88, 50]),
@@ -48,7 +48,9 @@ def threshold_color(image_name):
 	# ([103, 86, 65], [145, 133, 128])
 
 	boundaries = [
-		([30, 15, 90], [110, 80, 255])]
+		([17, 15, 90], [80, 80, 255])]
+
+	# boundaries = [([17, 15, 90], [50, 56, 255])]
 
 	# loop over the boundaries
 	for (lower, upper) in boundaries:
@@ -56,13 +58,17 @@ def threshold_color(image_name):
 		lower = np.array(lower, dtype = "uint8")
 		upper = np.array(upper, dtype = "uint8")
 
-		# lower2 = np.array([145, 133, 128], dtype = "uint8")
-		# upper2 = np.array([250, 250, 250], dtype = "uint8")
+		lower2 = np.array([0, 0, 50], dtype = "uint8")
+		upper2 = np.array([70, 20, 255], dtype = "uint8")
+
+		lower3 = np.array([20, 20, 50], dtype = "uint8")
+		upper3 = np.array([50, 50, 100], dtype = "uint8")
 
 		# find the colors within the specified boundaries and apply
 		# the mask
 		mask1 = cv2.inRange(image, lower, upper)
-		mask2 = cv2.inRange(image, lower, upper)
+		mask2 = cv2.inRange(image, lower2, upper2)
+		mask3 = cv2.inRange(image, lower3, upper3)
 		output = cv2.bitwise_and(image, image, mask = mask1 | mask2)
 		# output = cv2.GaussianBlur(output, (8, 8), 0)
 
