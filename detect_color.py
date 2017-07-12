@@ -69,7 +69,7 @@ def threshold_color(image_name):
 		mask1 = cv2.inRange(image, lower, upper)
 		mask2 = cv2.inRange(image, lower2, upper2)
 		mask3 = cv2.inRange(image, lower3, upper3)
-		output = cv2.bitwise_and(image, image, mask = mask1 | mask2)
+		output = cv2.bitwise_and(image, image, mask = mask1 | mask2 | mask3)
 		# output = cv2.GaussianBlur(output, (8, 8), 0)
 
 		# show the images
