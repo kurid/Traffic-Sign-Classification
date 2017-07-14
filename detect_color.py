@@ -70,10 +70,36 @@ def threshold_color(image_name):
 		mask2 = cv2.inRange(image, lower2, upper2)
 		mask3 = cv2.inRange(image, lower3, upper3)
 		output = cv2.bitwise_and(image, image, mask = mask1 | mask2 | mask3)
-		# output = cv2.GaussianBlur(output, (8, 8), 0)
+		# output = cv2.GaussianBlur(output, (21, 21), 0)
+		output = cv2.medianBlur(output, 9)
+
+
+		imgray = cv2.cvtColor(output,cv2.COLOR_BGR2GRAY)
+		ret,thresh = cv2.threshold(imgray, 0,200,cv2.THRESH_BINARY)
+		contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		
+
+		# print len(contours)
+		# print np.amin(contours[0], axis = 0)[0][0]
+		# print np.amax(contours[0], axis = 0)[0]
+		
+
+		for c in contours :
+			minx = np.amin(c, axis = 0)[0][0] - 10
+			miny = np.amin(c, axis = 0)[0][1] - 10
+			maxx = np.amax(c, axis = 0)[0][0] + 10
+			maxy = np.amax(c, axis = 0)[0][1] + 10
+			cnt = np.array([ [[minx, miny]], [[minx, maxy]], [[maxx, miny]], [[maxx, maxy]] ] )
+			print cnt
+			x,y,w,h = cv2.boundingRect(cnt)
+			cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),2)
+
+
+		cv2.imshow("Image", image)
+
 
 		# show the images
-		cv2.imshow("images", np.hstack([image, output]))
+		# cv2.imshow("images", np.hstack([image, output]))
 		cv2.waitKey(0)
 
 
