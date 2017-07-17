@@ -24,6 +24,40 @@ def equalizeHist(image_name):
 	return img_output
 
 
+def is_inner_box(cnts, cnt):
+	for c in cnts:
+		minx = c[0][0][0]
+		miny = c[0][0][1]
+		maxx = c[3][0][0]
+		maxy = c[3][0][1]
+		
+		minx1 = cnt[0][0][0]
+		miny1 = cnt[0][0][1]
+		maxx1 = cnt[3][0][0]
+		maxy1 = cnt[3][0][1]
+		if minx1 > minx and miny1 > miny and maxx1 < maxx and maxy1 < maxy:
+			print cnt
+			print "aaaaaaa"
+			return True
+	return False
+
+
+
+def remove_inner_boxes(cnts, image):
+	print 'AAAAA '
+	print len(cnts)
+	print cnts 
+	for cnt in cnts :
+		if is_inner_box(cnts, cnt):
+			continue
+		x,y,w,h = cv2.boundingRect(cnt)
+		cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),2)
+	
+	cv2.imshow("Image", image)
+	cv2.waitKey(0)
+
+
+
 def adjust_gamma(image, gamma=1.0):
 	# build a lookup table mapping the pixel values [0, 255] to
 	# their adjusted gamma values
@@ -83,24 +117,23 @@ def threshold_color(image_name):
 		# print np.amin(contours[0], axis = 0)[0][0]
 		# print np.amax(contours[0], axis = 0)[0]
 		
+		cnts = []
 
 		for c in contours :
-			minx = np.amin(c, axis = 0)[0][0] - 10
-			miny = np.amin(c, axis = 0)[0][1] - 10
-			maxx = np.amax(c, axis = 0)[0][0] + 10
-			maxy = np.amax(c, axis = 0)[0][1] + 10
-			cnt = np.array([ [[minx, miny]], [[minx, maxy]], [[maxx, miny]], [[maxx, maxy]] ] )
-			print cnt
-			x,y,w,h = cv2.boundingRect(cnt)
-			cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),2)
+			minx = np.amin(c, axis = 0)[0][0] - 5
+			miny = np.amin(c, axis = 0)[0][1] - 5
+			maxx = np.amax(c, axis = 0)[0][0] + 5
+			maxy = np.amax(c, axis = 0)[0][1] + 5
+			cnt = np.array([ [[minx, miny]], [[minx, maxy]], [[maxx, miny]], [[maxx, maxy]] ])
+			cnts.append(cnt)
+		
 
-
-		cv2.imshow("Image", image)
+		remove_inner_boxes(cnts, image)
 
 
 		# show the images
 		# cv2.imshow("images", np.hstack([image, output]))
-		cv2.waitKey(0)
+		# cv2.waitKey(0)
 
 
 # construct the argument parse and parse the arguments
