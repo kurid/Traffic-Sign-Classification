@@ -36,25 +36,17 @@ def is_inner_box(cnts, cnt):
 		maxx1 = cnt[3][0][0]
 		maxy1 = cnt[3][0][1]
 		if minx1 > minx and miny1 > miny and maxx1 < maxx and maxy1 < maxy:
-			print cnt
-			print "aaaaaaa"
 			return True
 	return False
 
 
 
 def remove_inner_boxes(cnts, image):
-	print 'AAAAA '
-	print len(cnts)
-	print cnts 
 	for cnt in cnts :
 		if is_inner_box(cnts, cnt):
 			continue
 		x,y,w,h = cv2.boundingRect(cnt)
 		cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),2)
-	
-	cv2.imshow("Image", image)
-	cv2.waitKey(0)
 
 
 
@@ -82,7 +74,9 @@ def threshold_color(image_name):
 	# ([103, 86, 65], [145, 133, 128])
 
 	boundaries = [
-		([17, 15, 90], [80, 80, 255])]
+		([0, 0, 70],[80, 40, 255])]
+
+
 
 	# boundaries = [([17, 15, 90], [50, 56, 255])]
 
@@ -92,24 +86,28 @@ def threshold_color(image_name):
 		lower = np.array(lower, dtype = "uint8")
 		upper = np.array(upper, dtype = "uint8")
 
-		lower2 = np.array([0, 0, 50], dtype = "uint8")
-		upper2 = np.array([70, 20, 255], dtype = "uint8")
+		lower2 = np.array([60, 40, 200], dtype = "uint8")
+		upper2 = np.array([100, 80, 255], dtype = "uint8")
 
-		lower3 = np.array([20, 20, 50], dtype = "uint8")
-		upper3 = np.array([50, 50, 100], dtype = "uint8")
+		lower3 = np.array([80, 40, 120], dtype = "uint8")
+		upper3 = np.array([120, 75, 150], dtype = "uint8")
+
+		lower4 = np.array([20, 0, 30], dtype = "uint8")
+		upper4 = np.array([50, 20, 60], dtype = "uint8")
 
 		# find the colors within the specified boundaries and apply
 		# the mask
 		mask1 = cv2.inRange(image, lower, upper)
 		mask2 = cv2.inRange(image, lower2, upper2)
 		mask3 = cv2.inRange(image, lower3, upper3)
-		output = cv2.bitwise_and(image, image, mask = mask1 | mask2 | mask3)
+		mask4 = cv2.inRange(image, lower4, upper4)
+		output = cv2.bitwise_and(image, image, mask = mask1 | mask2 | mask3 | mask4)
 		# output = cv2.GaussianBlur(output, (21, 21), 0)
 		output = cv2.medianBlur(output, 9)
 
 
 		imgray = cv2.cvtColor(output,cv2.COLOR_BGR2GRAY)
-		ret,thresh = cv2.threshold(imgray, 0,200,cv2.THRESH_BINARY)
+		ret,thresh = cv2.threshold(imgray, 0, 255, cv2.THRESH_BINARY)
 		contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		
 
@@ -132,8 +130,8 @@ def threshold_color(image_name):
 
 
 		# show the images
-		# cv2.imshow("images", np.hstack([image, output]))
-		# cv2.waitKey(0)
+		cv2.imshow("images", np.hstack([image, output]))
+		cv2.waitKey(0)
 
 
 # construct the argument parse and parse the arguments
