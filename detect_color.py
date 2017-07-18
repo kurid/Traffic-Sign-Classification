@@ -74,7 +74,7 @@ def threshold_color(image_name):
 	# ([103, 86, 65], [145, 133, 128])
 
 	boundaries = [
-		([0, 0, 70],[80, 40, 255])]
+		([0, 0, 55],[80, 40, 255])]
 
 
 
@@ -87,13 +87,13 @@ def threshold_color(image_name):
 		upper = np.array(upper, dtype = "uint8")
 
 		lower2 = np.array([60, 40, 200], dtype = "uint8")
-		upper2 = np.array([100, 80, 255], dtype = "uint8")
+		upper2 = np.array([120, 100, 255], dtype = "uint8")
 
 		lower3 = np.array([80, 40, 120], dtype = "uint8")
 		upper3 = np.array([120, 75, 150], dtype = "uint8")
 
-		lower4 = np.array([20, 0, 30], dtype = "uint8")
-		upper4 = np.array([50, 20, 60], dtype = "uint8")
+		lower4 = np.array([10, 0, 30], dtype = "uint8")
+		upper4 = np.array([50, 25, 65], dtype = "uint8")
 
 		# find the colors within the specified boundaries and apply
 		# the mask
