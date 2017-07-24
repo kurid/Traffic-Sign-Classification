@@ -7,6 +7,7 @@ import argparse
 import cv2
 import os
 import imageProcesing as imp
+from pyimagesearch.shapedetector import ShapeDetector
 
 
 
@@ -30,7 +31,6 @@ def inner_box_found(cnts, cnt):
 	return False
 
 
-
 def remove_inner_boxes(cnts, image):
 	new_cnts = []
 	for cnt in cnts :
@@ -47,10 +47,12 @@ def threshold_color(image_name):
 	# load the image
 
 	image = imp.equalizeHist(image_name)
+	# image = cv2.imread(image_name)
 	image = imp. adjust_gamma(image, 0.8)
+	# image = cv2.medianBlur(image, 5)
 
 	boundaries = [
-		([0, 0, 55],[80, 40, 255])]
+		([0, 0, 65],[100, 40, 255])]
 
 
 
@@ -62,14 +64,14 @@ def threshold_color(image_name):
 		lower = np.array(lower, dtype = "uint8")
 		upper = np.array(upper, dtype = "uint8")
 
-		lower2 = np.array([60, 40, 200], dtype = "uint8")
-		upper2 = np.array([120, 100, 255], dtype = "uint8")
+		lower2 = np.array([55, 40, 180], dtype = "uint8")
+		upper2 = np.array([135, 120, 255], dtype = "uint8")
 
-		lower3 = np.array([80, 40, 120], dtype = "uint8")
+		lower3 = np.array([70, 40, 120], dtype = "uint8")
 		upper3 = np.array([120, 75, 150], dtype = "uint8")
 
-		lower4 = np.array([10, 0, 30], dtype = "uint8")
-		upper4 = np.array([50, 25, 65], dtype = "uint8")
+		lower4 = np.array([2, 0, 30], dtype = "uint8")
+		upper4 = np.array([60, 25, 65], dtype = "uint8")
 
 		# find the colors within the specified boundaries and apply
 		# the mask
@@ -84,16 +86,15 @@ def threshold_color(image_name):
 
 		imgray = cv2.cvtColor(output,cv2.COLOR_BGR2GRAY)
 		ret,thresh = cv2.threshold(imgray, 0, 255, cv2.THRESH_BINARY)
-		contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		_ , contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	
-		
 		cnts = []
 
 		for c in contours :
-			minx = np.amin(c, axis = 0)[0][0] - 7
-			miny = np.amin(c, axis = 0)[0][1] - 7
-			maxx = np.amax(c, axis = 0)[0][0] + 7
-			maxy = np.amax(c, axis = 0)[0][1] + 7
+			minx = np.amin(c, axis = 0)[0][0] - 5
+			miny = np.amin(c, axis = 0)[0][1] - 5
+			maxx = np.amax(c, axis = 0)[0][0] + 5
+			maxy = np.amax(c, axis = 0)[0][1] + 5
 			cnt = np.array([ [[minx, miny]], [[minx, maxy]], [[maxx, miny]], [[maxx, maxy]] ])
 			cnts.append(cnt)
 
@@ -101,16 +102,20 @@ def threshold_color(image_name):
 		# cnts.extend(merge_intersecting_boxes(cnts,image))
 		cnts = remove_inner_boxes(cnts, image)
 
-		if len(cnts) != 0 :
-			x, y, width, height = cv2.boundingRect(cnts[0])
-			roi = image[y:y+height, x:x+width]
-			if  len(roi) != 0 and len(roi[0]) != 0 :
-				cv2.imshow("roi", roi)
-		else :
-			cv2.imshow("images", np.hstack([image, output]))
+		
+		# if len(cnts) != 0 :
+		# 	x, y, width, height = cv2.boundingRect(cnts[0])
+		# 	roi = image[y:y+height, x:x+width]
+		# 	if  len(roi) != 0 and len(roi[0]) != 0 :
+		# 		# cv2.imshow("roi", roi)
+		# 		imp.detect_circles(roi)
+
+		# else :
+		# 	cv2.imshow("images", np.hstack([image, output]))
 
 
 		# show the images
+		cv2.imshow("images", np.hstack([image, output]))
 		cv2.waitKey(0)
 
 

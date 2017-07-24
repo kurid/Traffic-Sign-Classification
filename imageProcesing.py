@@ -1,13 +1,15 @@
+from pyimagesearch.shapedetector import ShapeDetector
 import numpy as np
 import argparse
 import cv2
 import os
+import argparse
+import imutils
 
 
 
 def equalizeHist(image_name):
 	img = cv2.imread(image_name)
-
 	img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
 
 	# equalize the histogram of the Y channel
@@ -67,4 +69,71 @@ def merge_intersecting_boxes(cnts,image):
 				maxy = min(cnts[i][3][0][1], cnts[j][3][0][1])
 				newCnts.append(np.array([ [[minx, miny]], [[minx, maxy]], [[maxx, miny]], [[maxx, maxy]] ]))
 	return newCnts
+
+
+def detect_circles(image):
+	output = image.copy()
+	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.2, 100)
+ 
+# ensure at least some circles were found
+	if circles is not None:
+		# convert the (x, y) coordinates and radius of the circles to integers
+		circles = np.round(circles[0, :]).astype("int")
+	 
+		# loop over the (x, y) coordinates and radius of the circles
+		for (x, y, r) in circles:
+			# draw the circle in the output image, then draw a rectangle
+			# corresponding to the center of the circle
+			cv2.circle(output, (x, y), r, (0, 255, 0), 4)
+			cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+	 
+		# show the output image
+	cv2.imshow("output", np.hstack([image, output]))
+	cv2.waitKey(0)
+
+
+def detect_shape(image):
+	resized = imutils.resize(image, width=300)
+	ratio = image.shape[0] / float(resized.shape[0])
+
+	# convert the resized image to grayscale, blur it slightly,
+	# and threshold it
+
+	blurred = cv2.GaussianBlur(resized, (5, 5), 0)
+	gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
+	lab = cv2.cvtColor(blurred, cv2.COLOR_BGR2LAB)
+	thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)[1]
+	cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
+	cv2.CHAIN_APPROX_SIMPLE)
+	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+	sd = ShapeDetector()
+	for c in cnts:
+		# compute the center of the contour
+		M = cv2.moments(c)
+		if M["m00"] == 0:
+			continue
+
+		cX = int((M["m10"] / M["m00"]) * ratio)
+		cY = int((M["m01"] / M["m00"]) * ratio)
+
+		# detect the shape of the contour and label the color
+		shape = sd.detect(c)
+		if shape != 'circle':
+			continue
+		# multiply the contour (x, y)-coordinates by the resize ratio,
+		# then draw the contours and the name of the shape and labeled
+		# color on the image
+		c = c.astype("float")
+		c *= ratio
+		c = c.astype("int")
+		text = "{}".format(shape)
+		cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+		cv2.putText(image, text, (cX, cY),
+			cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+		# show the output image
+	cv2.imshow("Image", image)
+	cv2.waitKey(0)
+
 				
