@@ -83,11 +83,12 @@ def threshold_color(image_name):
 	
 	for cnt in cnts:
 		x, y, width, height = cv2.boundingRect(cnt)
-		roi = image[y:y+height, x:x+width]
-		if  len(roi) != 0 and len(roi[0]) != 0 :
-			if imp.detect_circles(roi) or imp.detect_shape(roi):
-				cv2.imshow("roi", roi)
-				cv2.waitKey(0)
+		roi = original_image[y:y+height, x:x+width]
+		if  width * height > 4000 and len(roi) != 0 and len(roi[0]) != 0 :
+			# if imp.detect_circles(roi) or imp.detect_shape(roi):
+			imp.calculate_hog(roi)
+			cv2.imshow("roi", roi)
+			cv2.waitKey(0)
 # construct the argument parse and parse the arguments
 # ap = argparse.ArgumentParser()
 # ap.add_argument("-i", "--image", help = "path to the image")
