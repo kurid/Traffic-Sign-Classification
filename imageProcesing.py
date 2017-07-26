@@ -170,8 +170,13 @@ def detect_ellipse(image):
 def calculate_hog(roi):
 	(H, hogImage) = feature.hog(cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY), orientations=9, pixels_per_cell=(8, 8),
 	cells_per_block=(2, 2), transform_sqrt=True, visualise=True)
-	print len(H)
 	hogImage = exposure.rescale_intensity(hogImage, out_range=(0, 255))
 	hogImage = hogImage.astype("uint8")
-	cv2.imshow("HOG Image", hogImage)
+	# cv2.imshow("HOG Image", hogImage)
+	return H
+
+
+def preprocesing(image):
+	return adjust_gamma(equalizeHist(image), 0.8)
+
 
